@@ -1,4 +1,5 @@
-package com.kirana.store.entities;
+package com.kiranastore.kirana_store.entities;
+
 
 import jakarta.persistence.*;
 

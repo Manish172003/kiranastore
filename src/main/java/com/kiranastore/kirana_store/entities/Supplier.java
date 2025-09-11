@@ -1,12 +1,11 @@
 package com.kiranastore.kirana_store.entities;
-import jakarta.persistence.*;
 
 import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "customers")
-public class Customer {
+@Table(name = "suppliers")
+public class Supplier {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +20,8 @@ public class Customer {
     @JoinColumn(name = "owner_id", nullable = false)
     private KiranaOwner owner;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductStock> productStocks;
 
     // Getters and Setters
     public Long getId() { return id; }
@@ -43,6 +42,6 @@ public class Customer {
     public KiranaOwner getOwner() { return owner; }
     public void setOwner(KiranaOwner owner) { this.owner = owner; }
 
-    public List<Order> getOrders() { return orders; }
-    public void setOrders(List<Order> orders) { this.orders = orders; }
+    public List<ProductStock> getProductStocks() { return productStocks; }
+    public void setProductStocks(List<ProductStock> productStocks) { this.productStocks = productStocks; }
 }
