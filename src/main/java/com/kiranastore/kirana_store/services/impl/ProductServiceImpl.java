@@ -9,10 +9,12 @@ import org.springframework.stereotype.Service;
 import com.kiranastore.kirana_store.dtos.ProductRequest;
 import com.kiranastore.kirana_store.dtos.ProductResponse;
 import com.kiranastore.kirana_store.entities.Product;
+import com.kiranastore.kirana_store.entities.Supplier;
 import com.kiranastore.kirana_store.entities.KiranaOwner;
 import com.kiranastore.kirana_store.exception.ResourceNotFoundException;
 import com.kiranastore.kirana_store.repositories.KiranaOwnerRepository;
 import com.kiranastore.kirana_store.repositories.ProductRepository;
+import com.kiranastore.kirana_store.repositories.SupplierRepository;
 import com.kiranastore.kirana_store.services.ProductService;
 
 @Service
@@ -24,12 +26,14 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private KiranaOwnerRepository ownerRepository;
 
-    //@Autowired
-    //private SupplierRepository supplierRepository;
+    @Autowired
+    private SupplierRepository supplierRepository;
 
     @Override
     public List<ProductResponse> getAllProductsByOwner(Long ownerId) {
-        return productRepository.findByKiranaOwnerId(ownerId)
+        KiranaOwner owner = ownerRepository.findById(ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with id: " + ownerId));
+        return productRepository.findByOwner(owner)
                 .stream()
                 .map(this::mapResponse)
                 .collect(Collectors.toList());
@@ -37,12 +41,12 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductResponse> getAllProductsBySupplier(Long supplierId) {
-        // return productRepository.findBySupplierId(supplierId)
-        //         .stream()
-        //         .map(this::mapResponse)
-        //         .collect(Collectors.toList());
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllProductsBySupplier'");
+        Supplier supplier = supplierRepository.findById(supplierId)
+               .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id: " + supplierId));        
+        return productRepository.findBySupplier(supplier)
+                .stream()
+                .map(this::mapResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -56,10 +60,9 @@ public class ProductServiceImpl implements ProductService{
     public ProductResponse createProduct(ProductRequest request) {
         KiranaOwner owner = ownerRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found with id: " + request.getOwnerId()));
-        //Supplier supplier = supplierRepository.findById(request.getSupplierId())
-        //        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id: " + request.getSupplierId()));
-        //Product product = mapEntity(request, owner, supplier);
-        Product product = mapEntity(request, owner);
+        Supplier supplier = supplierRepository.findById(request.getSupplierId())
+               .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with id: " + request.getSupplierId()));
+        Product product = mapEntity(request, owner, supplier);
         return mapResponse(productRepository.save(product));
     }
 
@@ -83,14 +86,14 @@ public class ProductServiceImpl implements ProductService{
         productRepository.delete(product);
     }
 
-    private Product mapEntity(ProductRequest request, KiranaOwner owner){
+    private Product mapEntity(ProductRequest request, KiranaOwner owner, Supplier supplier){
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
         //product.setPrice(request.getPrice());
         //product.setQuantity(request.getQuantity());
         product.setOwner(owner);
-        //product.setSupplier(supplier);
+        product.setSupplier(supplier);
         return product;
     }
 
