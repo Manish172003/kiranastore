@@ -9,4 +9,5 @@ public interface OrderService {
     OrderResponse getOrderById(Long id);
     List<OrderResponse> getAllOrders();
     void deleteOrder(Long id);
+    public List<OrderResponse> getOrdersByOwner(Long ownerId);
 }
