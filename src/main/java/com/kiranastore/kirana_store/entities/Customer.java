@@ -1,5 +1,4 @@
 package com.kiranastore.kirana_store.entities;
-import jakarta.persistence.*;
 
 import jakarta.persistence.*;
 import java.util.List;
@@ -13,7 +12,21 @@ public class Customer {
     private Long id;
 
     private String name;
-    private String phone;
+    public Customer(Long id, String name, String phone, String email, String address, KiranaOwner owner,
+			List<Order> orders) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.phone = phone;
+		this.email = email;
+		this.address = address;
+		this.owner = owner;
+		this.orders = orders;
+	}
+	public Customer() {
+		// TODO Auto-generated constructor stub
+	}
+	private String phone;
     private String email;
     private String address;
 

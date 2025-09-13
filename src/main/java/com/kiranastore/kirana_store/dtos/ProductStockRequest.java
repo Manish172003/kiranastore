@@ -9,7 +9,7 @@ public class ProductStockRequest {
 
     public ProductStockRequest() {
 		super();
-		// TODO Auto-generated constructor stub
+		
 	}
 	public ProductStockRequest(Long productId, Long supplierId, double price, int quantity) {
 		super();
@@ -18,7 +18,7 @@ public class ProductStockRequest {
 		this.price = price;
 		this.quantity = quantity;
 	}
-	// Getters and Setters
+	
     public Long getProductId() { return productId; }
     public void setProductId(Long productId) { this.productId = productId; }
 

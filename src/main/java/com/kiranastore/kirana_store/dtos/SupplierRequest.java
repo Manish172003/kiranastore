@@ -6,9 +6,8 @@ public class SupplierRequest {
     private String phone;
     private String address;
     private Long ownerId; 
-    private String ownerName;
-    
-
+ 
+   
     public SupplierRequest() {
 		super();
 		
@@ -21,7 +20,7 @@ public class SupplierRequest {
 		this.address = address;
 		this.ownerId = ownerId;
 	}
-	// Getters and Setters
+	
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
@@ -36,12 +35,7 @@ public class SupplierRequest {
 
     public Long getOwnerId() { return ownerId; }
     public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
-	public String getOwnerName() {
-		return ownerName;
-	}
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
-	}
+
     
     
 }

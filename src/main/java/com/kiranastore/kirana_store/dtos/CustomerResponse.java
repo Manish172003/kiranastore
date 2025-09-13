@@ -6,8 +6,38 @@ public class CustomerResponse {
     private String phone;
     private String email;
     private String address;
+    private Long ownerId;
+    private String ownerName;
 
-    public CustomerResponse() {}
+    public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
+	}
+
+	public CustomerResponse(Long id, String name, String phone, String email, String address, Long ownerId,
+			String ownerName) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.phone = phone;
+		this.email = email;
+		this.address = address;
+		this.ownerId = ownerId;
+		this.ownerName = ownerName;
+	}
+
+	public CustomerResponse() {}
 
     public CustomerResponse(Long id, String name, String phone, String email, String address) {
         this.id = id;

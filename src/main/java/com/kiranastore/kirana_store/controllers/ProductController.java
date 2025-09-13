@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-
+    
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
@@ -29,10 +29,13 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-//        return ResponseEntity.ok(productService.getAllProducts());
-//    }
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
+    }
+    
+	
+    
 
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,

@@ -1,12 +1,10 @@
 package com.kiranastore.kirana_store.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.kiranastore.kirana_store.dtos.CustomerRequest;
 import com.kiranastore.kirana_store.dtos.CustomerResponse;
 import com.kiranastore.kirana_store.services.CustomerService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -14,36 +12,35 @@ import java.util.List;
 @RequestMapping("/api/customers")
 public class CustomerController {
 
-    private final CustomerService service;
+    private final CustomerService customerService;
 
-    @Autowired
-    public CustomerController(CustomerService service) {
-        this.service = service;
+    public CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
     }
 
     @PostMapping
-    public ResponseEntity<CustomerResponse> create(@RequestBody CustomerRequest request) {
-        return ResponseEntity.ok(service.createCustomer(request));
+    public ResponseEntity<CustomerResponse> createCustomer(@RequestBody CustomerRequest request) {
+        return ResponseEntity.ok(customerService.createCustomer(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponse> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getCustomerById(id));
+    public ResponseEntity<CustomerResponse> getCustomer(@PathVariable Long id) {
+        return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerResponse>> getAll() {
-        return ResponseEntity.ok(service.getAllCustomers());
+    public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
+        return ResponseEntity.ok(customerService.getAllCustomers());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> update(@PathVariable Long id, @RequestBody CustomerRequest request) {
-        return ResponseEntity.ok(service.updateCustomer(id, request));
+    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable Long id, @RequestBody CustomerRequest request) {
+        return ResponseEntity.ok(customerService.updateCustomer(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.deleteCustomer(id);
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,6 +1,5 @@
 package com.kiranastore.kirana_store.entities;
 
-
 import jakarta.persistence.*;
 import java.util.List;
 

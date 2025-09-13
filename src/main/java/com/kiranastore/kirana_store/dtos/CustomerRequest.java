@@ -5,8 +5,26 @@ public class CustomerRequest {
     private String phone;
     private String email;
     private String address;
+    private Long ownerId;
 
-    public CustomerRequest() {}
+    public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public CustomerRequest(String name, String phone, String email, String address, Long ownerId) {
+		super();
+		this.name = name;
+		this.phone = phone;
+		this.email = email;
+		this.address = address;
+		this.ownerId = ownerId;
+	}
+
+	public CustomerRequest() {}
 
     public CustomerRequest(String name, String phone, String email, String address) {
         this.name = name;

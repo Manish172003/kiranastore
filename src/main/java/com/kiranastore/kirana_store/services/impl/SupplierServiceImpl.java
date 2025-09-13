@@ -42,7 +42,7 @@ public class SupplierServiceImpl implements SupplierService {
 
     @Override
     public List<SupplierResponse> getSuppliersByOwner(Long ownerId) {
-        return supplierRepository.findByKiranaOwnerId(ownerId)
+        return supplierRepository.findByOwner_Id(ownerId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

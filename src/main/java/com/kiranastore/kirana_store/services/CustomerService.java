@@ -1,9 +1,8 @@
 package com.kiranastore.kirana_store.services;
 
-import java.util.List;
-
 import com.kiranastore.kirana_store.dtos.CustomerRequest;
 import com.kiranastore.kirana_store.dtos.CustomerResponse;
+import java.util.List;
 
 public interface CustomerService {
     CustomerResponse createCustomer(CustomerRequest request);

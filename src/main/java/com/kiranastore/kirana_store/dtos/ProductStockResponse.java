@@ -12,7 +12,7 @@ public class ProductStockResponse {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public ProductStockResponse(Long id, Long productId, Long supplierId, double price, int quantity) {
+	public ProductStockResponse(Long id, double price, int quantity, Long productId, Long supplierId) {
 		super();
 		this.id = id;
 		this.productId = productId;
