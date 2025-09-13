@@ -1,7 +1,6 @@
 package com.kiranastore.kirana_store.dtos;
 
 
-
 public class ProductRequest {
     private String name;
     private String description;
