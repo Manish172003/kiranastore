@@ -14,7 +14,11 @@ public class ErrorResponse {
         this.message = message;
     }
 
-    public LocalDateTime getTimestamp() { return timestamp; }
+    public ErrorResponse() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public LocalDateTime getTimestamp() { return timestamp; }
 
 
 	public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }

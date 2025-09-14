@@ -35,8 +35,19 @@ public class KiranaOwner {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders;
+    
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    private User user;
 
-    // Getters and Setters
+    public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+	// Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
