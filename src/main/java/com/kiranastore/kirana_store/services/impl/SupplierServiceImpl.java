@@ -2,6 +2,7 @@ package com.kiranastore.kirana_store.services.impl;
 
 import org.springframework.stereotype.Service;
 
+import com.kiranastore.kirana_store.config.jwtUtil;
 import com.kiranastore.kirana_store.dtos.SupplierRequest;
 import com.kiranastore.kirana_store.dtos.SupplierResponse;
 import com.kiranastore.kirana_store.entities.KiranaOwner;
@@ -11,6 +12,8 @@ import com.kiranastore.kirana_store.repositories.KiranaOwnerRepository;
 import com.kiranastore.kirana_store.repositories.SupplierRepository;
 import com.kiranastore.kirana_store.services.SupplierService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,18 +22,36 @@ public class SupplierServiceImpl implements SupplierService {
 
     private final SupplierRepository supplierRepository;
     private final KiranaOwnerRepository ownerRepository;
+    private final jwtUtil JWTUTIL;
 
-    public SupplierServiceImpl(SupplierRepository supplierRepository, KiranaOwnerRepository ownerRepository) {
+    public SupplierServiceImpl(SupplierRepository supplierRepository, KiranaOwnerRepository ownerRepository, jwtUtil JWTUTIL) {
         this.supplierRepository = supplierRepository;
         this.ownerRepository = ownerRepository;
+		this.JWTUTIL = JWTUTIL;
     }
 
     @Override
-    public SupplierResponse addSupplier(SupplierRequest request) {
-        KiranaOwner owner = ownerRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with id " + request.getOwnerId()));
-        Supplier supplier = mapToEntity(request, owner);
-        return mapToResponse(supplierRepository.save(supplier));
+    public SupplierResponse addSupplier(SupplierRequest supplierRequest, HttpServletRequest request) {
+       
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        String token = authHeader.substring(7);
+
+        
+        String email = JWTUTIL.extractUserName(token);
+
+       
+        KiranaOwner owner = ownerRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with email: " + email));
+
+        
+        Supplier supplier = mapToEntity(supplierRequest, owner);
+
+        
+        Supplier savedSupplier = supplierRepository.save(supplier);
+        return mapToResponse(savedSupplier);
     }
 
     @Override

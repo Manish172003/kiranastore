@@ -8,6 +8,8 @@ import com.kiranastore.kirana_store.dtos.OrderRequest;
 import com.kiranastore.kirana_store.dtos.OrderResponse;
 import com.kiranastore.kirana_store.services.OrderService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 
 @RestController
@@ -22,10 +24,9 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest request) {
-        return ResponseEntity.ok(orderService.createOrder(request));
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest order,HttpServletRequest request) {
+        return ResponseEntity.ok(orderService.createOrder(order,request));
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long id) {
         return ResponseEntity.ok(orderService.getOrderById(id));

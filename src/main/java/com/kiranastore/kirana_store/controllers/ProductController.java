@@ -7,6 +7,8 @@ import com.kiranastore.kirana_store.dtos.ProductRequest;
 import com.kiranastore.kirana_store.dtos.ProductResponse;
 import com.kiranastore.kirana_store.services.ProductService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 
 @RestController
@@ -20,8 +22,8 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
-        return ResponseEntity.ok(productService.createProduct(request));
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest product,HttpServletRequest request) {
+        return ResponseEntity.ok(productService.createProduct(product,request));
     }
 
     @GetMapping("/{id}")

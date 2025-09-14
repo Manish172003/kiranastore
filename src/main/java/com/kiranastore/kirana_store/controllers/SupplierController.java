@@ -5,6 +5,8 @@ import com.kiranastore.kirana_store.dtos.SupplierRequest;
 import com.kiranastore.kirana_store.dtos.SupplierResponse;
 import com.kiranastore.kirana_store.services.SupplierService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 
 @RestController
@@ -18,8 +20,8 @@ public class SupplierController {
     }
 
     @PostMapping
-    public ResponseEntity<SupplierResponse> addSupplier(@RequestBody SupplierRequest request) {
-        return ResponseEntity.ok(supplierService.addSupplier(request));
+    public ResponseEntity<SupplierResponse> addSupplier(@RequestBody SupplierRequest supplier,HttpServletRequest request) {
+        return ResponseEntity.ok(supplierService.addSupplier(supplier,request));
     }
 
     @GetMapping("/{id}")

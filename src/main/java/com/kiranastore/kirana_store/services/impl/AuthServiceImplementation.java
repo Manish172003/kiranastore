@@ -65,7 +65,7 @@ public class AuthServiceImplementation implements AuthService {
        
         owner.setUser(savedUser);
 
-        ownerRepository.save(owner);
+        KiranaOwner saved = ownerRepository.save(owner);
 
         // Generate JWT
         org.springframework.security.core.userdetails.UserDetails userDetails =
@@ -77,7 +77,7 @@ public class AuthServiceImplementation implements AuthService {
 //        String token = jwtUtil.generateToken(userDetails);
 
         KiranaOwnerResponse resp = new KiranaOwnerResponse();
-        
+        resp.setId(saved.getId());
         resp.setName(request.getName());
         resp.setEmail(request.getEmail());
         resp.setStoreName(request.getStoreName());

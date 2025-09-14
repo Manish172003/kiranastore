@@ -2,6 +2,8 @@ package com.kiranastore.kirana_store.services.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.kiranastore.kirana_store.config.jwtUtil;
 import com.kiranastore.kirana_store.dtos.OrderItemResponse;
 import com.kiranastore.kirana_store.dtos.OrderRequest;
 import com.kiranastore.kirana_store.dtos.OrderResponse;
@@ -19,6 +21,7 @@ import com.kiranastore.kirana_store.repositories.ProductRepository;
 import com.kiranastore.kirana_store.repositories.ProductStockRepository;
 import com.kiranastore.kirana_store.services.OrderService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
@@ -32,37 +35,102 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerRepository customerRepository;
     private final ProductStockRepository productStockRepository;
     private final KiranaOwnerRepository ownerRepository;
+    private final jwtUtil JWTUTIL;
     public OrderServiceImpl(OrderRepository orderRepository,
                             CustomerRepository customerRepository,
-                            ProductStockRepository productStockRepository,KiranaOwnerRepository ownerRepository,ProductRepository productRepository) {
+                            ProductStockRepository productStockRepository,KiranaOwnerRepository ownerRepository,ProductRepository productRepository,
+                            jwtUtil JWTUTIL) {
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.productStockRepository = productStockRepository;
 		this.ownerRepository = ownerRepository;
+		this.JWTUTIL = JWTUTIL;
     }
 
+//    @Override
+//    public OrderResponse createOrder(OrderRequest order,HttpServletRequest request) {
+//        // 🔹 Find customer
+//        Customer customer = customerRepository.findById(order.getCustomerId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + order.getCustomerId()));
+//
+//        // 🔹 Find owner
+//        KiranaOwner owner = ownerRepository.findById(order.getOwnerId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with id " + order.getOwnerId()));
+//
+//        // 🔹 Create new Order
+//        Order uporder = new Order();
+//        uporder.setCustomer(customer);
+//        uporder.setOwner(owner);
+//        uporder.setOrderDate(LocalDateTime.now());
+//
+//        
+//        List<OrderItem> items = order.getItems().stream().map(itemReq -> {
+//            ProductStock stock = productStockRepository.findById(itemReq.getProductStockId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("ProductStock not found with id " + itemReq.getProductStockId()));
+//
+//        
+//            if (stock.getQuantity() < itemReq.getQuantity()) {
+//                throw new RuntimeException("Not enough stock available for product " + stock.getProduct().getName());
+//            }
+//
+//            // reduce stock
+//            stock.setQuantity(stock.getQuantity() - itemReq.getQuantity());
+//
+//            // create order item
+//            OrderItem item = new OrderItem();
+//            item.setOrder(uporder);
+//            item.setProduct(stock.getProduct());  
+//            item.setQuantity(itemReq.getQuantity());
+//            item.setSellingPrice(stock.getPrice());
+//
+//            return item;
+//        }).collect(Collectors.toList());
+//
+//        uporder.setOrderItems(items);
+//
+//        // 🔹 Calculate total
+//        double total = items.stream()
+//                .mapToDouble(i -> i.getSellingPrice() * i.getQuantity())
+//                .sum();
+//        uporder.setTotalAmount(total);
+//
+//        // 🔹 Save order
+//        Order savedOrder = orderRepository.save(uporder);
+//
+//        return mapToResponse(savedOrder);
+//    }
+    
     @Override
-    public OrderResponse createOrder(OrderRequest request) {
-        // 🔹 Find customer
-        Customer customer = customerRepository.findById(request.getCustomerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + request.getCustomerId()));
+    public OrderResponse createOrder(OrderRequest order, HttpServletRequest request) {
+        // 🔹 Extract JWT token
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        String jwt = authHeader.substring(7);
 
-        // 🔹 Find owner
-        KiranaOwner owner = ownerRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with id " + request.getOwnerId()));
+        // 🔹 Extract email from token
+        String username = JWTUTIL.extractUserName(jwt);
+
+        // 🔹 Find owner by email
+        KiranaOwner owner = ownerRepository.findByEmail(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with email " + username));
+
+        // 🔹 Find customer
+        Customer customer = customerRepository.findById(order.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id " + order.getCustomerId()));
 
         // 🔹 Create new Order
-        Order order = new Order();
-        order.setCustomer(customer);
-        order.setOwner(owner);
-        order.setOrderDate(LocalDateTime.now());
+        Order uporder = new Order();
+        uporder.setCustomer(customer);
+        uporder.setOwner(owner);
+        uporder.setOrderDate(LocalDateTime.now());
 
-        
-        List<OrderItem> items = request.getItems().stream().map(itemReq -> {
+        // 🔹 Map items
+        List<OrderItem> items = order.getItems().stream().map(itemReq -> {
             ProductStock stock = productStockRepository.findById(itemReq.getProductStockId())
                     .orElseThrow(() -> new ResourceNotFoundException("ProductStock not found with id " + itemReq.getProductStockId()));
 
-        
             if (stock.getQuantity() < itemReq.getQuantity()) {
                 throw new RuntimeException("Not enough stock available for product " + stock.getProduct().getName());
             }
@@ -72,27 +140,28 @@ public class OrderServiceImpl implements OrderService {
 
             // create order item
             OrderItem item = new OrderItem();
-            item.setOrder(order);
-            item.setProduct(stock.getProduct());  
+            item.setOrder(uporder);
+            item.setProduct(stock.getProduct());
             item.setQuantity(itemReq.getQuantity());
             item.setSellingPrice(stock.getPrice());
 
             return item;
         }).collect(Collectors.toList());
 
-        order.setOrderItems(items);
+        uporder.setOrderItems(items);
 
         // 🔹 Calculate total
         double total = items.stream()
                 .mapToDouble(i -> i.getSellingPrice() * i.getQuantity())
                 .sum();
-        order.setTotalAmount(total);
+        uporder.setTotalAmount(total);
 
         // 🔹 Save order
-        Order savedOrder = orderRepository.save(order);
+        Order savedOrder = orderRepository.save(uporder);
 
         return mapToResponse(savedOrder);
     }
+
 
 
 

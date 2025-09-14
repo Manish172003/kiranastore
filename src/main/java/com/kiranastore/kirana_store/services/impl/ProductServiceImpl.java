@@ -1,6 +1,8 @@
 package com.kiranastore.kirana_store.services.impl;
 
 import org.springframework.stereotype.Service;
+
+import com.kiranastore.kirana_store.config.jwtUtil;
 import com.kiranastore.kirana_store.dtos.ProductRequest;
 import com.kiranastore.kirana_store.dtos.ProductResponse;
 import com.kiranastore.kirana_store.dtos.ProductStockResponse;
@@ -11,6 +13,8 @@ import com.kiranastore.kirana_store.repositories.KiranaOwnerRepository;
 import com.kiranastore.kirana_store.repositories.ProductRepository;
 import com.kiranastore.kirana_store.services.ProductService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,20 +23,36 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final KiranaOwnerRepository ownerRepository;
+    private final jwtUtil JWTUTIL;
 
     public ProductServiceImpl(ProductRepository productRepository,
-                              KiranaOwnerRepository ownerRepository) {
+                              KiranaOwnerRepository ownerRepository,jwtUtil JWTUTIL) {
         this.productRepository = productRepository;
         this.ownerRepository = ownerRepository;
+        this.JWTUTIL =JWTUTIL;
     }
 
     @Override
-    public ProductResponse createProduct(ProductRequest request) {
-        KiranaOwner owner = ownerRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with id " + request.getOwnerId()));
+    public ProductResponse createProduct(ProductRequest product,HttpServletRequest request) {
+    	
+    	String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Missing or invalid Authorization header");
+        }
+        String jwt = authHeader.substring(7);
 
-        Product product = mapToEntity(request, owner);
-        return mapToResponse(productRepository.save(product));
+        
+        String username = JWTUTIL.extractUserName(jwt);
+
+        // 3. Find owner by email
+        KiranaOwner owner = ownerRepository.findByEmail(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found with email " + username));
+
+        // 4. Map request → entity
+        Product upproduct = mapToEntity(product, owner);
+
+        // 5. Save and return response
+        return mapToResponse(productRepository.save(upproduct));
     }
 
     @Override
